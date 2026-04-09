@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-<title>ПЛАНЫ на ДЕНЬ | Футбол с предметами</title>
+<title>ФУТБОЛ | Мультиплеер</title>
 <!-- Supabase JS -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
@@ -21,10 +21,9 @@
   h1 { 
     margin-bottom: 10px; 
     color: #e94560; 
-    font-size: 28px; 
-    letter-spacing: 2px;
-    text-shadow: 0 0 10px rgba(233,69,96,0.5);
-    text-transform: uppercase;
+    font-size: 32px; 
+    letter-spacing: 3px;
+    text-shadow: 0 0 15px rgba(233,69,96,0.5);
   }
   .controls { 
     display: flex; 
@@ -117,10 +116,15 @@
     border-bottom: 1px dashed rgba(233,69,96,0.3); 
     padding-bottom: 5px; 
   }
+  .game-container {
+    position: relative;
+    width: 900px;
+    max-width: 95vw;
+  }
   .canvas-wrapper { 
     position: relative; 
-    width: 900px; 
-    height: 600px; 
+    width: 100%; 
+    height: auto;
     border-radius: 16px; 
     overflow: hidden;
     box-shadow: 0 10px 40px rgba(0,0,0,0.3);
@@ -129,7 +133,7 @@
   canvas { 
     display: block; 
     width: 100%; 
-    height: 100%; 
+    height: auto; 
     cursor: pointer; 
   }
   .timer-box { 
@@ -187,21 +191,35 @@
     justify-content: space-between; 
     gap: 20px; 
     font-weight: bold; 
-    font-size: 28px; 
+    font-size: 32px; 
   }
   .score-p1 { 
-    color: #111; 
-    background: white; 
+    color: #ff3333; 
+    background: rgba(0,0,0,0.5); 
     padding: 0 12px; 
     border-radius: 8px; 
-    min-width: 50px;
+    min-width: 60px;
+    text-shadow: 0 0 5px #ff3333;
+    position: relative;
+  }
+  .score-p1::after {
+    content: "ТЫ";
+    position: absolute;
+    font-size: 10px;
+    bottom: -18px;
+    left: 50%;
+    transform: translateX(-50%);
+    color: #ff6666;
+    white-space: nowrap;
+    font-weight: normal;
   }
   .score-p2 { 
-    color: #0055ff; 
-    background: white; 
+    color: #3399ff; 
+    background: rgba(0,0,0,0.5); 
     padding: 0 12px; 
     border-radius: 8px; 
-    min-width: 50px;
+    min-width: 60px;
+    text-shadow: 0 0 5px #3399ff;
   }
   .hint { 
     margin-top: 12px; 
@@ -239,17 +257,97 @@
     font-size: 12px; 
     font-weight: bold;
   }
+  /* ЧАТ - за пределами игрового поля */
+  .chat-outside {
+    position: fixed;
+    bottom: 20px;
+    left: 20px;
+    width: 280px;
+    background: #0f3460;
+    border-radius: 12px;
+    border: 2px solid #e94560;
+    z-index: 100;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+    transition: 0.2s;
+  }
+  .chat-header {
+    padding: 10px 14px;
+    background: #e94560;
+    border-radius: 10px 10px 0 0;
+    font-size: 13px;
+    font-weight: bold;
+    cursor: grab;
+    display: flex;
+    justify-content: space-between;
+    user-select: none;
+  }
+  .chat-header:active {
+    cursor: grabbing;
+  }
+  .chat-messages {
+    height: 160px;
+    overflow-y: auto;
+    padding: 8px;
+    font-size: 11px;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    background: #16213e;
+  }
+  .chat-message {
+    padding: 5px 10px;
+    background: rgba(255,255,255,0.1);
+    border-radius: 8px;
+    word-break: break-word;
+  }
+  .chat-message .name {
+    font-weight: bold;
+    margin-right: 6px;
+  }
+  .chat-message .name.red { color: #ff6666; }
+  .chat-message .name.blue { color: #66aaff; }
+  .chat-input-area {
+    display: flex;
+    padding: 8px;
+    gap: 8px;
+    border-top: 1px solid #e94560;
+    background: #0f3460;
+    border-radius: 0 0 10px 10px;
+  }
+  .chat-input-area input {
+    flex: 1;
+    padding: 6px 10px;
+    border-radius: 20px;
+    border: 1px solid #e94560;
+    background: #16213e;
+    color: white;
+    font-size: 11px;
+    outline: none;
+  }
+  .chat-input-area button {
+    padding: 6px 12px;
+    font-size: 11px;
+    background: #e94560;
+  }
+  .chat-outside.minimized .chat-messages,
+  .chat-outside.minimized .chat-input-area {
+    display: none;
+  }
   @media (max-width: 950px) {
-    .canvas-wrapper { width: 95vw; height: calc(95vw * 0.666); }
-    h1 { font-size: 20px; }
+    .canvas-wrapper { width: 100%; height: auto; }
+    canvas { width: 100%; height: auto; }
+    h1 { font-size: 24px; }
     .countdown { font-size: 16px; }
-    .score-row { font-size: 20px; gap: 10px; }
-    .score-p1, .score-p2 { padding: 0 8px; min-width: 35px; }
+    .score-row { font-size: 22px; gap: 10px; }
+    .score-p1, .score-p2 { padding: 0 8px; min-width: 45px; }
+    .score-p1::after { font-size: 8px; bottom: -14px; }
+    .chat-outside { width: 250px; bottom: 10px; left: 10px; }
+    .chat-messages { height: 120px; }
   }
 </style>
 </head>
 <body>
-<h1>⚽ ПЛАНЫ на ДЕНЬ ⚽</h1>
+<h1>⚽ ФУТБОЛ ⚽</h1>
 <div class="controls">
   <span style="color:white;">💥 Ударов: <strong id="kickCount" style="color:#e94560;">0</strong></span>
   <button id="resetBtn">🔄 Сброс</button>
@@ -259,12 +357,12 @@
 </div>
 
 <div class="instructions" id="instrBlock" style="display:none;">
-  <b>🔗 МУЛЬТИПЛЕЕР (через Supabase):</b>
-  <div class="step">1️⃣ Оба игрока открывают <b>ОДНУ ССЫЛКУ</b> (GitHub Pages)</div>
+  <b>🔗 МУЛЬТИПЛЕЕР:</b>
+  <div class="step">1️⃣ Оба игрока открывают <b>ОДНУ ССЫЛКУ</b></div>
   <div class="step">2️⃣ Нажимают <b>«Подключить друга»</b> → вводят <b>ОДИНАКОВЫЙ КОД</b></div>
-  <div class="step">3️⃣ <b>Первый</b> = ⚫ чёрный (забивает в <b>правые</b> ворота)</div>
-  <div class="step">4️⃣ <b>Второй</b> = 🔵 синий (забивает в <b>левые</b> ворота)</div>
-  <div class="step">💡 Игра работает и без подключения — просто в одиночку</div>
+  <div class="step">3️⃣ <b>🔴 КРАСНЫЙ</b> (ты) → забивает в <b style="color:#3399ff;">СИНИЕ</b> ворота</div>
+  <div class="step">4️⃣ <b>🔵 СИНИЙ</b> (соперник) → забивает в <b style="color:#ff3333;">КРАСНЫЕ</b> ворота</div>
+  <div class="step">💬 ЧАТ можно перетаскивать за заголовок</div>
 </div>
 
 <div class="connect-panel" id="connectPanel">
@@ -272,27 +370,42 @@
     <div><label>🔑 Код комнаты:</label><input type="text" id="roomInput" value="room1" placeholder="room123"></div>
     <button id="btnConnect" style="height:38px;">🟢 Подключиться</button>
   </div>
-  <div style="font-size:11px; color:#aaa;">Оба вводят <b>одинаковый код</b>. Игра работает и без этого.</div>
+  <div style="font-size:11px; color:#aaa;">Оба вводят <b>одинаковый код</b></div>
 </div>
 
-<div class="canvas-wrapper" id="canvasWrapper">
-  <canvas id="gameCanvas" width="900" height="600"></canvas>
-  <div class="timer-box">
-    <div class="timer-label">⏰ ДО КОНЦА ДНЯ:</div>
-    <div id="countdown" class="countdown">00:00:00</div>
-    <div id="systemTime" class="sys-time">--:--:--</div>
-  </div>
-  <div class="score-box">
-    <div class="score-title">🏆 СЧЁТ</div>
-    <div class="score-row">
-      <span class="score-p1" id="scoreP1">0</span>
-      <span style="color:white;">:</span>
-      <span class="score-p2" id="scoreP2">0</span>
+<div class="game-container">
+  <div class="canvas-wrapper" id="canvasWrapper">
+    <canvas id="gameCanvas" width="900" height="600"></canvas>
+    <div class="timer-box">
+      <div class="timer-label">⏰ ДО КОНЦА ДНЯ:</div>
+      <div id="countdown" class="countdown">00:00:00</div>
+      <div id="systemTime" class="sys-time">--:--:--</div>
     </div>
+    <div class="score-box">
+      <div class="score-title">🏆 СЧЁТ</div>
+      <div class="score-row">
+        <span class="score-p1" id="scoreP1">0</span>
+        <span style="color:white;">:</span>
+        <span class="score-p2" id="scoreP2">0</span>
+      </div>
+    </div>
+    <div class="debug" id="debugInfo">init...</div>
   </div>
-  <div class="debug" id="debugInfo">init...</div>
 </div>
-<p class="hint">⚫ ЧЁРНЫЙ → забивает в <span style="color:#e94560;">ПРАВЫЕ</span> ворота | 🔵 СИНИЙ → забивает в <span style="color:#e94560;">ЛЕВЫЕ</span> ворота | Кликай на предметы!</p>
+<p class="hint">🔴 КРАСНЫЙ (ТЫ) → забивает в <span style="color:#3399ff;">СИНИЕ</span> ворота | 🔵 СИНИЙ (СОПЕРНИК) → забивает в <span style="color:#ff3333;">КРАСНЫЕ</span> ворота | Кликай на предметы!</p>
+
+<!-- ЧАТ снаружи игрового поля, перетаскиваемый -->
+<div class="chat-outside" id="chatOutside">
+  <div class="chat-header" id="chatHeader">
+    <span>💬 ЧАТ</span>
+    <span>▼</span>
+  </div>
+  <div class="chat-messages" id="chatMessages"></div>
+  <div class="chat-input-area">
+    <input type="text" id="chatInput" placeholder="Сообщение..." maxlength="100">
+    <button id="chatSendBtn">➤</button>
+  </div>
+</div>
 
 <script>
 // ==========================================
@@ -324,29 +437,39 @@ const scoreP2El = document.getElementById('scoreP2');
 const debugInfo = document.getElementById('debugInfo');
 const playersCountEl = document.getElementById('playersCount');
 
-const W = 900, H = 600, grassHeight = 60, GOAL_W = 30, GOAL_H = 120;
+// Чат
+const chatOutside = document.getElementById('chatOutside');
+const chatMessages = document.getElementById('chatMessages');
+const chatInput = document.getElementById('chatInput');
+const chatSendBtn = document.getElementById('chatSendBtn');
+const chatHeader = document.getElementById('chatHeader');
+
+const W = 900, H = 600, grassHeight = 60;
+// Ворота увеличены на 50%: было 240, стало 360
+const GOAL_W = 30, GOAL_H = 360;
 let kickCount = 0;
 let score = { p1: 0, p2: 0 };
 let particles = [];
 let floatingTexts = [];
 
-// === МОЙ СТИКМЕН ===
+// === МОЙ СТИКМЕН (КРАСНЫЙ) ===
 const myStickman = { 
   x: W/2, y: H - grassHeight - 40, baseY: H - grassHeight - 40,
   targetX: 0, targetY: 0, speed: 7, kicking: false, kickTimer: 0,
   kickDuration: 18, legAngle: 0, dir: 1, state: 'idle', animFrame: 0,
-  currentTarget: null, color: '#111'
+  currentTarget: null, color: '#ff3333'
 };
 
-// === ДРУГОЙ СТИКМЕН ===
+// === ДРУГОЙ СТИКМЕН (СИНИЙ) ===
 const otherStickman = {
   x: W*2/3, y: H - grassHeight - 40, baseY: H - grassHeight - 40,
   speed: 7, kicking: false, kickTimer: 0, kickDuration: 18,
-  legAngle: 0, dir: -1, state: 'idle', animFrame: 0, color: '#0055ff'
+  legAngle: 0, dir: -1, state: 'idle', animFrame: 0, color: '#3399ff'
 };
 
 // === ПРЕДМЕТЫ ===
 let dicks = [];
+let scoredItems = new Set(); // ID забитых предметов
 
 function createDicks(count) {
   const newDicks = [];
@@ -358,7 +481,8 @@ function createDicks(count) {
       vx: 0, vy: 0, angle: Math.random() * Math.PI * 2,
       angularVel: 0, ballRadius: 5 + Math.random() * 3,
       shaftLength: 0, shaftWidth: 0, flying: false,
-      bounceCount: 0, lineWidth: 2.5
+      bounceCount: 0, lineWidth: 2.5,
+      active: true
     });
   }
   for(let d of newDicks) {
@@ -368,42 +492,138 @@ function createDicks(count) {
   return newDicks;
 }
 
+function resetDicks() {
+  scoredItems.clear();
+  dicks = createDicks(8);
+}
+
 dicks = createDicks(8);
 
 // Фразы
 const kickPhrases = ['НАХУЙ ЭТОТ ОТЧЁТ!', 'ПОШЛА НАХУЙ РАБОТА!', 'ХУЙ ЗНАЮ!', 'ЕБАТЬ КОЛОТИТЬ!', 'В КОРЗИНУ!', 'ЗАВТРА!', 'СВОБОДА!', 'ДОМОЙ!', 'ОТПУСК!', 'ПОТОМ!', 'БАМ!', 'УЛЕТЕЛ!'];
 
+// === ПЕРЕТАСКИВАНИЕ ЧАТА ===
+let isDragging = false;
+let dragOffsetX = 0, dragOffsetY = 0;
+
+chatHeader.addEventListener('mousedown', (e) => {
+  if (e.target.closest('.chat-header span:last-child')) return;
+  isDragging = true;
+  const rect = chatOutside.getBoundingClientRect();
+  dragOffsetX = e.clientX - rect.left;
+  dragOffsetY = e.clientY - rect.top;
+  chatOutside.style.cursor = 'grabbing';
+  e.preventDefault();
+});
+
+document.addEventListener('mousemove', (e) => {
+  if (!isDragging) return;
+  let newLeft = e.clientX - dragOffsetX;
+  let newTop = e.clientY - dragOffsetY;
+  newLeft = Math.max(0, Math.min(window.innerWidth - chatOutside.offsetWidth, newLeft));
+  newTop = Math.max(0, Math.min(window.innerHeight - chatOutside.offsetHeight, newTop));
+  chatOutside.style.left = newLeft + 'px';
+  chatOutside.style.top = newTop + 'px';
+  chatOutside.style.bottom = 'auto';
+  chatOutside.style.right = 'auto';
+});
+
+document.addEventListener('mouseup', () => {
+  isDragging = false;
+  chatOutside.style.cursor = '';
+});
+
+// === ЧАТ ===
+function addChatMessage(sender, text, isMe = false) {
+  const msgDiv = document.createElement('div');
+  msgDiv.className = 'chat-message';
+  const nameSpan = document.createElement('span');
+  nameSpan.className = `name ${sender === 'КРАСНЫЙ' ? 'red' : 'blue'}`;
+  nameSpan.textContent = sender + ': ';
+  const textSpan = document.createElement('span');
+  textSpan.textContent = text;
+  msgDiv.appendChild(nameSpan);
+  msgDiv.appendChild(textSpan);
+  chatMessages.appendChild(msgDiv);
+  chatMessages.scrollTop = chatMessages.scrollHeight;
+  
+  while(chatMessages.children.length > 50) {
+    chatMessages.removeChild(chatMessages.firstChild);
+  }
+}
+
+function sendChatMessage() {
+  const text = chatInput.value.trim();
+  if(!text) return;
+  if(!isConnected) {
+    addChatMessage('СИСТЕМА', 'Подключитесь к комнате для чата');
+    chatInput.value = '';
+    return;
+  }
+  if(!supabaseChannel) return;
+  
+  const senderName = myRole === 'p1' ? 'КРАСНЫЙ' : 'СИНИЙ';
+  addChatMessage(senderName, text, true);
+  
+  supabaseChannel.send({
+    type: 'broadcast',
+    event: 'chat',
+    payload: { sender: senderName, text: text }
+  });
+  
+  chatInput.value = '';
+}
+
+chatSendBtn.onclick = sendChatMessage;
+chatInput.onkeypress = (e) => { if(e.key === 'Enter') sendChatMessage(); };
+let chatMinimized = false;
+chatHeader.querySelector('span:last-child').onclick = (e) => {
+  e.stopPropagation();
+  chatMinimized = !chatMinimized;
+  if(chatMinimized) {
+    chatOutside.classList.add('minimized');
+    chatHeader.querySelector('span:last-child').textContent = '▲';
+  } else {
+    chatOutside.classList.remove('minimized');
+    chatHeader.querySelector('span:last-child').textContent = '▼';
+  }
+};
+
 // === ФИЗИКА ===
 function updateDicks() {
   for(let d of dicks) {
+    if(!d.active) continue;
     if(d.flying) {
       d.x += d.vx;
       d.y += d.vy;
-      d.vy += 0.18;
+      d.vy += 0.12;
       d.angle += d.angularVel;
       d.vx *= 0.995;
       d.vy *= 0.995;
       
-      // Стены
+      // Стены с отскоком
       if(d.x < d.ballRadius && (d.y < H - grassHeight - GOAL_H/2 || d.y > H - grassHeight + GOAL_H/2)) {
         d.x = d.ballRadius;
         d.vx *= -0.75;
         d.angularVel *= -0.8;
+        spawnBounceEffect(d.x, d.y);
       }
       if(d.x > W - d.ballRadius && (d.y < H - grassHeight - GOAL_H/2 || d.y > H - grassHeight + GOAL_H/2)) {
         d.x = W - d.ballRadius;
         d.vx *= -0.75;
         d.angularVel *= -0.8;
+        spawnBounceEffect(d.x, d.y);
       }
       
       // Земля
       let gy = H - grassHeight - 3;
       if(d.y > gy) {
         d.y = gy;
-        d.vy *= -0.6;
-        d.vx *= 0.8;
+        d.vy *= -0.5;
+        d.vx *= 0.85;
         d.angularVel *= 0.75;
-        if(Math.abs(d.vy) < 0.8) {
+        spawnBounceEffect(d.x, d.y);
+        if(Math.abs(d.vy) < 0.5) {
           d.vy = 0;
           d.vx *= 0.92;
           if(Math.abs(d.vx) < 0.2) {
@@ -417,39 +637,48 @@ function updateDicks() {
   }
 }
 
+function spawnBounceEffect(x, y) {
+  for(let i = 0; i < 5; i++) {
+    particles.push({
+      x, y, vx: (Math.random() - 0.5) * 4, vy: (Math.random() - 0.5) * 4 - 1,
+      life: 15, max: 15, size: 1 + Math.random() * 2, color: '#aaaaaa'
+    });
+  }
+}
+
 function checkGoal(d) {
+  if(!d.active) return;
   const goalTop = H - grassHeight - GOAL_H/2;
   const goalBottom = H - grassHeight + GOAL_H/2;
   
+  // Красный игрок (p1) забивает в синие ворота (левые)
+  // Синий игрок (p2) забивает в красные ворота (правые)
   if(d.x < GOAL_W + 5 && d.y > goalTop && d.y < goalBottom && d.vx < -2) {
-    scoreGoal('p2', d);
+    scoreGoal('p1', d);
   }
   if(d.x > W - GOAL_W - 5 && d.y > goalTop && d.y < goalBottom && d.vx > 2) {
-    scoreGoal('p1', d);
+    scoreGoal('p2', d);
   }
 }
 
 function scoreGoal(scoringPlayer, d) {
-  const isOwnGoal = (scoringPlayer === 'p1' && d.x < W/2) || (scoringPlayer === 'p2' && d.x > W/2);
-  const actualScorer = isOwnGoal ? (scoringPlayer === 'p1' ? 'p2' : 'p1') : scoringPlayer;
+  if(!d.active) return;
   
-  score[actualScorer]++;
+  score[scoringPlayer]++;
   scoreP1El.textContent = score.p1;
   scoreP2El.textContent = score.p2;
   
   canvasWrapper.classList.add('goal-flash');
   setTimeout(() => canvasWrapper.classList.remove('goal-flash'), 300);
   
-  const txt = isOwnGoal ? '🤦 АВТОГОЛ!' : (actualScorer === 'p1' ? '⚫ ГОЛ!' : '🔵 ГОЛ!');
+  const txt = scoringPlayer === 'p1' ? '🔴 ГОЛ! КРАСНЫЕ ЗАБИЛИ!' : '🔵 ГОЛ! СИНИЕ ЗАБИЛИ!';
   spawnText(W/2, H/2, txt);
   spawnKickParticles(d.x, d.y);
   
-  d.x = W/2;
-  d.y = H - grassHeight - 30;
-  d.vx = 0;
-  d.vy = 0;
+  // Предмет исчезает (не появляется снова)
+  d.active = false;
   d.flying = false;
-  d.angle = 0;
+  scoredItems.add(d.id);
   
   // Синхронизация
   if(isConnected && supabaseChannel) {
@@ -463,7 +692,8 @@ function getObjectsData() {
   dicks.forEach(d => {
     data[d.id] = {
       x: d.x, y: d.y, vx: d.vx, vy: d.vy,
-      angle: d.angle, angularVel: d.angularVel, flying: d.flying
+      angle: d.angle, angularVel: d.angularVel, 
+      flying: d.flying, active: d.active
     };
   });
   return data;
@@ -471,6 +701,7 @@ function getObjectsData() {
 
 // === ОТРИСОВКА ===
 function drawDick(d) {
+  if(!d.active) return;
   ctx.save();
   ctx.translate(d.x, d.y);
   ctx.rotate(d.angle);
@@ -581,13 +812,18 @@ function drawField() {
   ctx.moveTo(0, H - grassHeight);
   ctx.lineTo(W, H - grassHeight);
   ctx.stroke();
-  // Ворота
-  ctx.fillStyle = 'rgba(0,0,0,0.3)';
-  ctx.fillRect(0, H - grassHeight - GOAL_H/2, GOAL_W, GOAL_H);
+  
+  // КРАСНЫЕ ворота (правые) - для синего игрока
+  ctx.fillStyle = 'rgba(255,50,50,0.3)';
   ctx.fillRect(W - GOAL_W, H - grassHeight - GOAL_H/2, GOAL_W, GOAL_H);
-  ctx.strokeStyle = 'white';
-  ctx.strokeRect(0, H - grassHeight - GOAL_H/2, GOAL_W, GOAL_H);
+  ctx.strokeStyle = '#ff3333';
   ctx.strokeRect(W - GOAL_W, H - grassHeight - GOAL_H/2, GOAL_W, GOAL_H);
+  
+  // СИНИЕ ворота (левые) - для красного игрока
+  ctx.fillStyle = 'rgba(51,153,255,0.3)';
+  ctx.fillRect(0, H - grassHeight - GOAL_H/2, GOAL_W, GOAL_H);
+  ctx.strokeStyle = '#3399ff';
+  ctx.strokeRect(0, H - grassHeight - GOAL_H/2, GOAL_W, GOAL_H);
 }
 
 function spawnKickParticles(x, y) {
@@ -650,14 +886,11 @@ function drawTexts() {
 
 // === ВЗАИМОДЕЙСТВИЕ ===
 function hitTest(mx, my, d) {
+  if(!d.active) return false;
   return Math.hypot(mx - d.x, my - d.y) < d.ballRadius * 3.5;
 }
 
 canvas.addEventListener('click', (e) => {
-  if(!isConnected) {
-    setStatus('⚠️ Сначала подключись к комнате!', '#ff6b6b');
-    return;
-  }
   if(myStickman.state !== 'idle' && myStickman.state !== 'returning') return;
   
   let rect = canvas.getBoundingClientRect();
@@ -670,6 +903,7 @@ canvas.addEventListener('click', (e) => {
   let minD = Infinity;
   
   for(let d of dicks) {
+    if(!d.active) continue;
     if(hitTest(mx, my, d)) {
       let dist = Math.hypot(d.x - myStickman.x, d.y - myStickman.y);
       if(dist < minD) {
@@ -717,10 +951,10 @@ function updateStickman(s, isLocal) {
     
     if(p > 0.42 && p < 0.48 && s.currentTarget && isLocal) {
       let d = s.currentTarget;
-      let spd = 11 + Math.random() * 7;
-      let ang = -Math.PI / 2 + (Math.random() - 0.5) * 1.1;
+      let spd = 12 + Math.random() * 6;
+      let ang = (Math.random() - 0.5) * 0.8 - 0.3;
       let vx = Math.cos(ang) * spd * s.dir;
-      let vy = Math.sin(ang) * spd - 4;
+      let vy = Math.sin(ang) * spd - 2;
       let av = (Math.random() - 0.5) * 0.35;
       
       d.flying = true;
@@ -750,7 +984,7 @@ function updateStickman(s, isLocal) {
   }
   
   if(s.state === 'returning') {
-    let homeX = (s.color === '#111') ? W/2 : W*2/3;
+    let homeX = (s.color === '#ff3333') ? W/2 : W*2/3;
     s.x += (homeX - s.x) * 0.04;
     s.y = s.baseY;
     if(Math.abs(homeX - s.x) < 2) {
@@ -776,15 +1010,14 @@ async function connectToSupabase(roomId) {
     
     let roleAssigned = false;
     
-    // Слушаем события
     supabaseChannel.on('broadcast', { event: 'player_joined' }, ({ payload }) => {
       debug(`Player joined: ${payload.playerId} as ${payload.role}`);
       if(!roleAssigned && payload.role === 'p1' && myRole === null && payload.playerId !== myId) {
         myRole = 'p2';
-        myStickman.color = '#0055ff';
+        myStickman.color = '#3399ff';
         myStickman.x = W*2/3;
         roleAssigned = true;
-        setStatus(`🟢 Онлайн! Вы: 🔵 СИНИЙ (забивайте ←)`);
+        setStatus(`🟢 Онлайн! Вы: 🔵 СИНИЙ (забивайте в КРАСНЫЕ ворота →)`);
         playersCountEl.style.display = 'inline-block';
         playersCountEl.textContent = '👥 2/2';
         supabaseChannel.send({ type: 'broadcast', event: 'player_joined', payload: { playerId: myId, role: myRole } });
@@ -801,7 +1034,7 @@ async function connectToSupabase(roomId) {
           otherStickman.kicking = payload.data.kicking;
           otherStickman.animFrame = payload.data.animFrame;
           otherStickman.legAngle = payload.data.legAngle;
-          otherStickman.color = '#111';
+          otherStickman.color = '#ff3333';
         }
         if(payload.role === 'p2') {
           otherStickman.x = payload.data.x;
@@ -811,7 +1044,7 @@ async function connectToSupabase(roomId) {
           otherStickman.kicking = payload.data.kicking;
           otherStickman.animFrame = payload.data.animFrame;
           otherStickman.legAngle = payload.data.legAngle;
-          otherStickman.color = '#0055ff';
+          otherStickman.color = '#3399ff';
         }
       }
     });
@@ -828,6 +1061,7 @@ async function connectToSupabase(roomId) {
             d.angle = payload.objects[id].angle;
             d.angularVel = payload.objects[id].angularVel;
             d.flying = payload.objects[id].flying;
+            d.active = payload.objects[id].active;
           }
         }
       }
@@ -850,17 +1084,20 @@ async function connectToSupabase(roomId) {
       if(payload.reset) resetGame();
     });
     
-    // Подписываемся
+    supabaseChannel.on('broadcast', { event: 'chat' }, ({ payload }) => {
+      addChatMessage(payload.sender, payload.text);
+    });
+    
     supabaseChannel.subscribe((status) => {
       debug(`Channel status: ${status}`);
       if(status === 'SUBSCRIBED') {
         setTimeout(() => {
           if(!roleAssigned && myRole === null) {
             myRole = 'p1';
-            myStickman.color = '#111';
+            myStickman.color = '#ff3333';
             myStickman.x = W/2;
             roleAssigned = true;
-            setStatus(`🟢 Онлайн! Вы: ⚫ ЧЁРНЫЙ (забивайте →)`);
+            setStatus(`🟢 Онлайн! Вы: 🔴 КРАСНЫЙ (забивайте в СИНИЕ ворота ←)`);
             playersCountEl.style.display = 'inline-block';
             playersCountEl.textContent = '👥 1/2';
             supabaseChannel.send({ type: 'broadcast', event: 'player_joined', payload: { playerId: myId, role: myRole } });
@@ -870,7 +1107,6 @@ async function connectToSupabase(roomId) {
       }
     });
     
-    // Отправка состояния
     if(syncInterval) clearInterval(syncInterval);
     syncInterval = setInterval(() => {
       if(isConnected && supabaseChannel && myRole) {
@@ -902,7 +1138,8 @@ function setStatus(t, c = '#fff') {
 }
 
 function debug(msg) {
-  debugInfo.innerHTML = msg + ' | ' + (isConnected ? '🟢' : '⚫') + ' | ' + dicks.length + ' items';
+  const activeCount = dicks.filter(d => d.active).length;
+  debugInfo.innerHTML = msg + ' | ' + (isConnected ? '🟢' : '⚫') + ' | items:' + activeCount;
 }
 
 // === ТАЙМЕР ===
@@ -928,7 +1165,7 @@ function resetGame() {
   score = { p1: 0, p2: 0 };
   scoreP1El.textContent = '0';
   scoreP2El.textContent = '0';
-  dicks = createDicks(8);
+  resetDicks();
   particles = [];
   floatingTexts = [];
   
@@ -937,11 +1174,16 @@ function resetGame() {
     myStickman.x = W/2;
     myStickman.kicking = false;
     otherStickman.x = W*2/3;
-  } else {
+  } else if(myRole === 'p2') {
     myStickman.state = 'idle';
     myStickman.x = W*2/3;
     myStickman.kicking = false;
     otherStickman.x = W/2;
+  } else {
+    myStickman.state = 'idle';
+    myStickman.x = W/2;
+    myStickman.kicking = false;
+    otherStickman.x = W*2/3;
   }
   otherStickman.state = 'idle';
   otherStickman.kicking = false;
@@ -984,6 +1226,7 @@ function gameLoop() {
   // Тени
   ctx.fillStyle = 'rgba(0,0,0,0.2)';
   for(let d of dicks) {
+    if(!d.active) continue;
     ctx.beginPath();
     ctx.ellipse(d.x, H - grassHeight - 2, d.ballRadius * 1.5, 4, 0, 0, Math.PI * 2);
     ctx.fill();
